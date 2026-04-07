@@ -6,7 +6,6 @@ const { validate } = require('../middleware/validate');
 const generateToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-// Validators
 const registerValidators = [
   body('name').trim().isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
   body('email').isEmail().withMessage('Valid email required').normalizeEmail(),
@@ -20,7 +19,6 @@ const loginValidators = [
   validate,
 ];
 
-// @route  POST /api/auth/register
 const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -40,7 +38,6 @@ const register = async (req, res) => {
   }
 };
 
-// @route  POST /api/auth/login
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -63,7 +60,6 @@ const login = async (req, res) => {
   }
 };
 
-// @route  GET /api/auth/me
 const getMe = async (req, res) => {
   res.json({ user: req.user });
 };

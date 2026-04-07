@@ -31,11 +31,10 @@ const taskSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // adds createdAt & updatedAt automatically
+    timestamps: true,
   }
 );
 
-// Index for fast queries
 taskSchema.index({ owner: 1, status: 1 });
 taskSchema.index({ title: 'text' });
 

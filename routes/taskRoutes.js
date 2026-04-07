@@ -10,7 +10,7 @@ const {
 } = require('../controllers/taskController');
 const { protect } = require('../middleware/auth');
 
-router.use(protect); // All task routes require auth
+router.use(protect);
 
 router.get('/',     getTasks);
 router.post('/',    taskValidators, createTask);

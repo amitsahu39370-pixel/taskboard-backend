@@ -13,7 +13,6 @@ const taskValidators = [
   validate,
 ];
 
-// Validators for PUT (title is optional since only status might change)
 const updateValidators = [
   body('title').optional().trim().notEmpty().withMessage('Title cannot be blank').isLength({ max: 200 }),
   body('description').optional().trim().isLength({ max: 2000 }),
@@ -24,7 +23,6 @@ const updateValidators = [
   validate,
 ];
 
-// @route GET /api/tasks
 const getTasks = async (req, res) => {
   try {
     const { search = '', status = '' } = req.query;
@@ -47,7 +45,6 @@ const getTasks = async (req, res) => {
   }
 };
 
-// @route POST /api/tasks
 const createTask = async (req, res) => {
   try {
     const { title, description = '', status = 'todo' } = req.body;
@@ -59,10 +56,8 @@ const createTask = async (req, res) => {
       owner: req.user._id,
     });
 
-    // Use plain object so _id is a string everywhere (REST + socket)
     const taskObj = task.toObject();
 
-    // Emit socket event — only to this user's room
     const io = req.app.get('io');
     io.to(`user:${req.user._id}`).emit('task:created', taskObj);
 
@@ -73,7 +68,6 @@ const createTask = async (req, res) => {
   }
 };
 
-// @route PUT /api/tasks/:id
 const updateTask = async (req, res) => {
   try {
     const { id } = req.params;
@@ -87,7 +81,6 @@ const updateTask = async (req, res) => {
       return res.status(404).json({ message: 'Task not found' });
     }
 
-    // ── Conflict handling: last-write-wins via updatedAt ──
     if (clientUpdatedAt) {
       const incoming = new Date(clientUpdatedAt).getTime();
       const stored = new Date(task.updatedAt).getTime();
@@ -105,10 +98,8 @@ const updateTask = async (req, res) => {
 
     await task.save();
 
-    // Use plain object so _id is a string everywhere (REST + socket)
     const taskObj = task.toObject();
 
-    // Emit socket event — only to this user's room
     const io = req.app.get('io');
     io.to(`user:${req.user._id}`).emit('task:updated', taskObj);
 
@@ -119,7 +110,6 @@ const updateTask = async (req, res) => {
   }
 };
 
-// @route DELETE /api/tasks/:id
 const deleteTask = async (req, res) => {
   try {
     const { id } = req.params;
@@ -132,7 +122,6 @@ const deleteTask = async (req, res) => {
       return res.status(404).json({ message: 'Task not found' });
     }
 
-    // Emit socket event — use string id, not ObjectId, for direct client-side comparison
     const idStr = id.toString();
     const io = req.app.get('io');
     io.to(`user:${req.user._id}`).emit('task:deleted', { id: idStr });

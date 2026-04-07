@@ -25,7 +25,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Hash password before saving
 userSchema.pre('save', async function (next) {
   if (!this.isModified('passwordHash')) return next();
   const salt = await bcrypt.genSalt(12);
@@ -33,12 +32,10 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// Compare password
 userSchema.methods.comparePassword = async function (password) {
   return bcrypt.compare(password, this.passwordHash);
 };
 
-// Remove sensitive fields from JSON output
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.passwordHash;
