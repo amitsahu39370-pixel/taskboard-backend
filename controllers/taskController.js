@@ -81,16 +81,6 @@ const updateTask = async (req, res) => {
       return res.status(404).json({ message: 'Task not found' });
     }
 
-    if (clientUpdatedAt) {
-      const incoming = new Date(clientUpdatedAt).getTime();
-      const stored = new Date(task.updatedAt).getTime();
-      if (incoming < stored) {
-        return res.status(409).json({
-          message: 'Conflict: Your version is outdated. Latest task returned.',
-          task: task.toObject(),
-        });
-      }
-    }
 
     if (title !== undefined) task.title = title;
     if (description !== undefined) task.description = description;
@@ -101,6 +91,7 @@ const updateTask = async (req, res) => {
     const taskObj = task.toObject();
 
     const io = req.app.get('io');
+    console.log("📡 Emitting task update to:", `user:${req.user._id}`);
     io.to(`user:${req.user._id}`).emit('task:updated', taskObj);
 
     res.json({ task: taskObj });
